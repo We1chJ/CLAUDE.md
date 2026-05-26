@@ -2,6 +2,14 @@
 
 Configuration files for Claude Code.
 
+## Statusline Preview
+
+```
+📂 my-app | ★ Claude Haiku | Context: ▓▓▓░░░░░░░ 35% | Session: ▓▓░░░░░░░░ 22% | Weekly: ▓░░░░░░░░░ 9%
+```
+
+Custom statusline showing folder, model, context usage, and plan limits with color-coded progress bars.
+
 ## Files
 
 - **CLAUDE.md** - Global instructions and coding guidelines for Claude Code sessions
