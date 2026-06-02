@@ -2,6 +2,8 @@
 
 **Honestly just toss this into Claude and tell it to set it up for you lol**
 
+![Platform Support](https://camo.githubusercontent.com/f95fa034d83e7049df1402b9f0a007b39eed90274dcfb08b96ad07b92a898dfb/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6d61634f5325323025374325323057696e646f77732532302537432532304c696e75782d3131313832373f7374796c653d666f722d7468652d6261646765)
+
 Configuration files for Claude Code, including a custom status bar for the terminal.
 
 > **Note:** The Session and Weekly usage bars are designed for users on a **Claude subscription plan (Pro, Max, etc.)**. If you're on API billing, those segments won't show anything — the rest of the bar (folder, model, context %) works for everyone.
