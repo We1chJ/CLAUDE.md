@@ -52,7 +52,7 @@ if [ -n "$used" ]; then
 fi
 
 # Add plan usage if available
-usage_data=$(/Users/welchj/.claude/fetch-usage.sh 2>/dev/null)
+usage_data=$("$HOME/.claude/fetch-usage.sh" 2>/dev/null)
 if [ -n "$usage_data" ]; then
   session=$(echo "$usage_data" | jq -r '.session // empty' 2>/dev/null)
   weekly=$(echo "$usage_data" | jq -r '.weekly // empty' 2>/dev/null)

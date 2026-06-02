@@ -1,5 +1,5 @@
 #!/bin/sh
-CACHE_FILE="/Users/welchj/.claude/usage-cache.json"
+CACHE_FILE="$HOME/.claude/usage-cache.json"
 CACHE_MAX_AGE=60
 
 # Check if cache exists and is fresh
