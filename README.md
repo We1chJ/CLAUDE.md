@@ -15,7 +15,17 @@ Custom statusline showing folder, model, context usage, and plan limits with col
 - **CLAUDE.md** - Global instructions and coding guidelines for Claude Code sessions
 - **settings.json** - Claude Code settings including permissions, statusline configuration, and preferences
 - **statusline.sh** - Script that renders the status bar
-- **fetch-usage.sh** - Script that fetches session and weekly usage from the Anthropic API
+- **fetch-usage.sh** - Helper script that fetches session and weekly usage from the Anthropic API
+
+## Statusline
+
+The statusline displays:
+- Current folder
+- Active model
+- Context window usage
+- Session and weekly plan usage limits
+
+All with color-coded progress bars (green → yellow → red as usage increases).
 
 ---
 
@@ -25,72 +35,67 @@ Custom statusline showing folder, model, context usage, and plan limits with col
 
 Place `statusline.sh` and `fetch-usage.sh` in your `~/.claude/` directory and make them executable:
 
+```sh
+chmod +x ~/.claude/statusline.sh
+chmod +x ~/.claude/fetch-usage.sh
+```
+
+On **Windows (WSL or Git Bash)**, `~/.claude/` resolves to your home directory the same way.
+
+### 2. Update `settings.json` — required manual step
+
+`settings.json` is the one file that **cannot use `$HOME` or relative paths**. Claude Code reads it before any shell expansion, so you must hardcode your full path.
+
+Open `~/.claude/settings.json` and update the `statusLine` command to your actual username:
+
 **macOS / Linux:**
-```sh
-chmod +x ~/.claude/statusline.sh
-chmod +x ~/.claude/fetch-usage.sh
-```
-
-**Windows (WSL or Git Bash):**
-```sh
-chmod +x ~/.claude/statusline.sh
-chmod +x ~/.claude/fetch-usage.sh
-```
-
-**Windows (plain PowerShell / cmd):** The scripts are shell scripts and require WSL or Git Bash. Native PowerShell is not supported.
-
----
-
-### 2. Update settings.json
-
-Open `~/.claude/settings.json` and add the following block (or merge it into the existing file):
-
 ```json
 "statusLine": {
   "type": "command",
-  "command": "sh /FULL/PATH/TO/.claude/statusline.sh"
+  "command": "sh /home/YOUR_USERNAME/.claude/statusline.sh"
 }
 ```
 
-> **Important:** `settings.json` does NOT support `~` or `$HOME` — Claude Code reads this file before any shell expansion, so you must use the **full absolute path** to `statusline.sh`.
-
-Replace the path depending on your OS:
-
-| OS | Example path |
-|---|---|
-| macOS | `sh /Users/yourname/.claude/statusline.sh` |
-| Linux | `sh /home/yourname/.claude/statusline.sh` |
-| Windows (WSL) | `sh /home/yourname/.claude/statusline.sh` |
-| Windows (Git Bash) | `sh C:/Users/yourname/.claude/statusline.sh` |
-
----
-
-### 3. Install dependencies
-
-Both scripts require `jq` and `curl`:
-
-**macOS:**
-```sh
-brew install jq curl
-```
-
-**Linux (Debian/Ubuntu):**
-```sh
-sudo apt install jq curl
+**macOS specifically:**
+```json
+"statusLine": {
+  "type": "command",
+  "command": "sh /Users/YOUR_USERNAME/.claude/statusline.sh"
+}
 ```
 
 **Windows (WSL):**
-```sh
-sudo apt install jq curl
+```json
+"statusLine": {
+  "type": "command",
+  "command": "sh /home/YOUR_USERNAME/.claude/statusline.sh"
+}
 ```
 
----
+**Windows (Git Bash):**
+```json
+"statusLine": {
+  "type": "command",
+  "command": "sh C:/Users/YOUR_USERNAME/.claude/statusline.sh"
+}
+```
+
+Replace `YOUR_USERNAME` with your actual system username in all cases.
+
+### 3. Dependencies
+
+Make sure these are installed:
+
+| Tool | macOS | Linux | Windows (WSL) |
+|------|-------|-------|---------------|
+| `jq` | `brew install jq` | `apt install jq` | `apt install jq` |
+| `curl` | built-in | `apt install curl` | `apt install curl` |
 
 ### 4. Platform notes
 
-| Feature | macOS | Linux | Windows (WSL) | Windows (native) |
-|---|---|---|---|---|
-| Directory, model, context % | Yes | Yes | Yes | No |
-| Session % and Weekly % | Yes | No | No | No |
+| Feature | macOS | Linux | Windows (WSL) |
+|---------|-------|-------|---------------|
+| Directory, model, context % | ✅ | ✅ | ✅ |
+| Session % and Weekly % | ✅ | ❌ | ❌ |
 
-The Session and Weekly usage segments rely on the macOS `security` keychain CLI to read your Claude OAuth token. On Linux and WSL, those segments are silently skipped — the rest of the bar still works.
+Session and weekly usage require the macOS `security` keychain CLI to read your Claude OAuth token. On Linux/WSL these segments are silently skipped — the rest of the bar still works.
