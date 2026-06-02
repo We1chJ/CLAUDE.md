@@ -1,6 +1,10 @@
 # Claude Configuration
 
+**Honestly just toss this into Claude and tell it to set it up for you lol**
+
 Configuration files for Claude Code, including a custom status bar for the terminal.
+
+> **Note:** The Session and Weekly usage bars are designed for users on a **Claude subscription plan (Pro, Max, etc.)**. If you're on API billing, those segments won't show anything — the rest of the bar (folder, model, context %) works for everyone.
 
 ## Statusline Preview
 
