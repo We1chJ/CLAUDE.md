@@ -15,7 +15,11 @@ if [ -f "$CACHE_FILE" ]; then
 fi
 
 # Cache is stale or missing, fetch new data
+# Try macOS keychain first, fall back to credentials file (Linux)
 TOKEN=$(security find-generic-password -s 'Claude Code-credentials' -w 2>/dev/null | jq -r '.claudeAiOauth.accessToken' 2>/dev/null)
+if [ -z "$TOKEN" ]; then
+  TOKEN=$(jq -r '.claudeAiOauth.accessToken // empty' "$HOME/.claude/.credentials.json" 2>/dev/null)
+fi
 
 if [ -z "$TOKEN" ]; then
   exit 1

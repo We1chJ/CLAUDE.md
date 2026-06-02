@@ -1,62 +1,73 @@
 # Claude Configuration
 
-Configuration files for Claude Code.
+Configuration files for Claude Code, including a custom status bar for the terminal.
 
 ## Statusline Preview
 
 ```
-📂 my-app | ★ Claude Haiku | Context: ▓▓▓░░░░░░░ 35% | Session: ▓▓░░░░░░░░ 22% | Weekly: ▓░░░░░░░░░ 9%
+📂 my-app | ★ Claude Sonnet | Context: ▓▓▓░░░░░░░ 35% | Session: ▓▓░░░░░░░░ 22% | Weekly: ▓░░░░░░░░░ 9%
 ```
 
-Custom statusline showing folder, model, context usage, and plan limits with color-coded progress bars.
-
-## Files
-
-- **CLAUDE.md** - Global instructions and coding guidelines for Claude Code sessions
-- **settings.json** - Claude Code settings including permissions, statusline configuration, and preferences
-- **statusline.sh** - Script that renders the status bar
-- **fetch-usage.sh** - Helper script that fetches session and weekly usage from the Anthropic API
-
-## Statusline
-
-The statusline displays:
-- Current folder
-- Active model
-- Context window usage
-- Session and weekly plan usage limits
-
-All with color-coded progress bars (green → yellow → red as usage increases).
+Color-coded progress bars for context window, session usage, and weekly plan usage — always visible at the bottom of your terminal.
 
 ---
 
-## Setup Instructions
+## Files
 
-### 1. Copy the scripts
+| File | Platform | Purpose |
+|---|---|---|
+| `CLAUDE.md` | All | Global instructions and coding guidelines for Claude Code |
+| `settings.json` | All | Claude Code settings — permissions, statusline config, plugins |
+| `statusline.sh` | macOS / Linux / WSL | Shell script that renders the status bar |
+| `fetch-usage.sh` | macOS / Linux / WSL | Helper that fetches session and weekly usage from Anthropic API |
+| `statusline.js` | Windows (native) | Node.js script that renders the status bar (no shell required) |
 
-Place `statusline.sh` and `fetch-usage.sh` in your `~/.claude/` directory and make them executable:
+---
+
+## What the status bar shows
+
+- **📂 Folder** — current working directory
+- **★ Model** — which Claude model is active
+- **Context bar** — how full the context window is (green → yellow → red)
+- **Session bar** — 5-hour rolling usage against your plan limit
+- **Weekly bar** — 7-day rolling usage against your plan limit
+
+---
+
+## Setup
+
+Pick your platform:
+
+- [macOS](#macos)
+- [Linux](#linux)
+- [Windows — native (Git Bash / PowerShell)](#windows--native)
+- [Windows — WSL](#windows--wsl)
+
+---
+
+### macOS
+
+**1. Copy files**
 
 ```sh
-chmod +x ~/.claude/statusline.sh
-chmod +x ~/.claude/fetch-usage.sh
+# Files are already here if you cloned the repo into ~/.claude
+# If not, copy them manually:
+cp statusline.sh ~/.claude/statusline.sh
+cp fetch-usage.sh ~/.claude/fetch-usage.sh
+chmod +x ~/.claude/statusline.sh ~/.claude/fetch-usage.sh
 ```
 
-On **Windows (WSL or Git Bash)**, `~/.claude/` resolves to your home directory the same way.
+**2. Install dependencies**
 
-### 2. Update `settings.json` — required manual step
-
-`settings.json` is the one file that **cannot use `$HOME` or relative paths**. Claude Code reads it before any shell expansion, so you must hardcode your full path.
-
-Open `~/.claude/settings.json` and update the `statusLine` command to your actual username:
-
-**macOS / Linux:**
-```json
-"statusLine": {
-  "type": "command",
-  "command": "sh /home/YOUR_USERNAME/.claude/statusline.sh"
-}
+```sh
+brew install jq
+# curl is built-in on macOS
 ```
 
-**macOS specifically:**
+**3. Update `settings.json`**
+
+Open `~/.claude/settings.json` and set the `statusLine` key. Replace `YOUR_USERNAME` with your macOS username (run `whoami` if unsure):
+
 ```json
 "statusLine": {
   "type": "command",
@@ -64,7 +75,46 @@ Open `~/.claude/settings.json` and update the `statusLine` command to your actua
 }
 ```
 
-**Windows (WSL):**
+> **Why hardcode the path?** Claude Code reads `settings.json` before any shell is started, so `$HOME` and `~` are not expanded. The full path is required.
+
+**4. Restart Claude Code**
+
+```sh
+exit
+claude
+```
+
+**Features available on macOS:**
+
+| Feature | Works? |
+|---|---|
+| Folder, model, context % | ✅ |
+| Session % and Weekly % | ✅ (reads token from macOS keychain) |
+
+---
+
+### Linux
+
+**1. Copy files**
+
+```sh
+cp statusline.sh ~/.claude/statusline.sh
+cp fetch-usage.sh ~/.claude/fetch-usage.sh
+chmod +x ~/.claude/statusline.sh ~/.claude/fetch-usage.sh
+```
+
+**2. Install dependencies**
+
+```sh
+sudo apt install jq curl   # Debian/Ubuntu
+# or
+sudo dnf install jq curl   # Fedora/RHEL
+```
+
+**3. Update `settings.json`**
+
+Open `~/.claude/settings.json` and set the `statusLine` key. Replace `YOUR_USERNAME` with your Linux username (run `whoami` if unsure):
+
 ```json
 "statusLine": {
   "type": "command",
@@ -72,30 +122,105 @@ Open `~/.claude/settings.json` and update the `statusLine` command to your actua
 }
 ```
 
-**Windows (Git Bash):**
+**4. Restart Claude Code**
+
+```sh
+exit
+claude
+```
+
+**Features available on Linux:**
+
+| Feature | Works? |
+|---|---|
+| Folder, model, context % | ✅ |
+| Session % and Weekly % | ✅ (reads token from `~/.claude/.credentials.json`) |
+
+> The credentials file is created automatically when you log in to Claude Code. If Session/Weekly bars don't appear, check that `~/.claude/.credentials.json` exists and contains `claudeAiOauth.accessToken`.
+
+---
+
+### Windows — native
+
+On native Windows, inline shell commands in `settings.json` can break silently due to how Windows handles certain characters. The fix: use `statusline.js` — a Node.js script — instead of the shell script. Node.js is already installed since Claude Code requires it.
+
+**1. Copy the file**
+
+Open File Explorer and copy `statusline.js` to `C:\Users\YOUR_USERNAME\.claude\statusline.js`.
+
+Or from Git Bash / PowerShell:
+
+```sh
+cp statusline.js ~/.claude/statusline.js
+```
+
+**2. No extra dependencies needed**
+
+`statusline.js` uses only Node.js built-ins (`https`, `fs`, `path`, `os`). Nothing to install.
+
+**3. Update `settings.json`**
+
+Open `C:\Users\YOUR_USERNAME\.claude\settings.json`. Replace `YOUR_USERNAME` with your Windows username:
+
 ```json
 "statusLine": {
   "type": "command",
-  "command": "sh C:/Users/YOUR_USERNAME/.claude/statusline.sh"
+  "command": "node C:/Users/YOUR_USERNAME/.claude/statusline.js"
 }
 ```
 
-Replace `YOUR_USERNAME` with your actual system username in all cases.
+Use forward slashes (`/`) in the path, not backslashes.
 
-### 3. Dependencies
+**4. Restart Claude Code**
 
-Make sure these are installed:
+Close and reopen the Claude Code terminal, or type `exit` then `claude`.
 
-| Tool | macOS | Linux | Windows (WSL) |
-|------|-------|-------|---------------|
-| `jq` | `brew install jq` | `apt install jq` | `apt install jq` |
-| `curl` | built-in | `apt install curl` | `apt install curl` |
+**Features available on Windows (native):**
 
-### 4. Platform notes
+| Feature | Works? |
+|---|---|
+| Folder, model, context % | ✅ |
+| Session % and Weekly % | ✅ (reads token from `~/.claude/.credentials.json`) |
 
-| Feature | macOS | Linux | Windows (WSL) |
-|---------|-------|-------|---------------|
-| Directory, model, context % | ✅ | ✅ | ✅ |
-| Session % and Weekly % | ✅ | ❌ | ❌ |
+> The credentials file is created automatically when you log in to Claude Code at `C:\Users\YOUR_USERNAME\.claude\.credentials.json`.
 
-Session and weekly usage require the macOS `security` keychain CLI to read your Claude OAuth token. On Linux/WSL these segments are silently skipped — the rest of the bar still works.
+---
+
+### Windows — WSL
+
+WSL runs a full Linux environment, so the Linux setup applies exactly. Follow the [Linux instructions](#linux) above, using your WSL home directory path (e.g. `/home/YOUR_USERNAME`).
+
+**Features available on WSL:**
+
+| Feature | Works? |
+|---|---|
+| Folder, model, context % | ✅ |
+| Session % and Weekly % | ✅ (reads token from `~/.claude/.credentials.json`) |
+
+---
+
+## Feature support summary
+
+| Feature | macOS | Linux | Windows (native) | Windows (WSL) |
+|---|---|---|---|---|
+| Folder, model, context % | ✅ | ✅ | ✅ | ✅ |
+| Session % and Weekly % | ✅ | ✅ | ✅ | ✅ |
+
+> Session/Weekly % require a Claude Max or Pro subscription. On API billing plans, these segments will be empty.
+
+---
+
+## Troubleshooting
+
+**Status bar doesn't appear at all**
+- Check that the path in `settings.json` is correct and uses your actual username
+- Confirm the script file exists at that path
+- Restart Claude Code after any change to `settings.json`
+
+**Session/Weekly % not showing**
+- Make sure you are logged in to Claude Code (the credentials file is created on login)
+- On macOS: verify the keychain entry exists by running `security find-generic-password -s 'Claude Code-credentials' -w`
+- On Linux/Windows: verify `~/.claude/.credentials.json` exists and is valid JSON
+
+**Bar appears but looks broken (missing characters)**
+- Your terminal font may not support block characters (`▓░`). Switch to a monospace font like JetBrains Mono, Fira Code, or any Nerd Font.
