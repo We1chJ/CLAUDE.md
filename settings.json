@@ -100,11 +100,15 @@
       "/tmp"
     ]
   },
-  "model": "haiku",
+  "statusLine": {
+    "type": "command",
+    "command": "sh /Users/welchj/.claude/statusline.sh"
+  },
   "enabledPlugins": {
     "andrej-karpathy-skills@karpathy-skills": true,
     "context7@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true
+    "frontend-design@claude-plugins-official": true,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": true
   },
   "extraKnownMarketplaces": {
     "karpathy-skills": {
@@ -112,11 +116,13 @@
         "source": "github",
         "repo": "forrestchang/andrej-karpathy-skills"
       }
+    },
+    "ui-ux-pro-max-skill": {
+      "source": {
+        "source": "github",
+        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
+      }
     }
   },
-  "effortLevel": "high",
-  "statusLine": {
-    "type": "command",
-    "command": "sh /Users/welchj/.claude/statusline.sh"
-  }
+  "effortLevel": "high"
 }
